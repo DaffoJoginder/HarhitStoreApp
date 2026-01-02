@@ -325,6 +325,26 @@ export const updateProduct = async (req: Request, res: Response) => {
       }
     });
 
+    // Handle file uploads
+    if (
+      req.files &&
+      Array.isArray(req.files) &&
+      (req.files as any[]).length > 0
+    ) {
+      const newImages = (req.files as Express.Multer.File[]).map((file) =>
+        getFileUrl(file.filename)
+      );
+
+      // Fetch existing product to get current images
+      const existingProduct = await prisma.product.findUnique({
+        where: { id: productId },
+        select: { images: true },
+      });
+
+      const currentImages = (existingProduct?.images as string[]) || [];
+      mappedData.images = [...currentImages, ...newImages];
+    }
+
     const product = await prisma.product.update({
       where: { id: productId },
       data: mappedData,
