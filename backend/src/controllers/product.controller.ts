@@ -286,40 +286,51 @@ export const updateProduct = async (req: Request, res: Response) => {
 
     // Map field names to database column names
     const mappedData: any = {};
-    if (updateData.category_id) mappedData.categoryId = updateData.category_id;
+    if (updateData.category_id)
+      mappedData.category = { connect: { id: updateData.category_id } };
     if (updateData.subcategory_id)
-      mappedData.subcategoryId = updateData.subcategory_id;
+      mappedData.subcategory = { connect: { id: updateData.subcategory_id } };
     if (updateData.quantity_per_unit)
-      mappedData.quantityPerUnit = updateData.quantity_per_unit;
-    if (updateData.b2c_mrp) mappedData.b2cMrp = updateData.b2c_mrp;
+      mappedData.quantityPerUnit = Number(updateData.quantity_per_unit);
+    if (updateData.b2c_mrp) mappedData.b2cMrp = Number(updateData.b2c_mrp);
     if (updateData.b2c_selling_price)
-      mappedData.b2cSellingPrice = updateData.b2c_selling_price;
+      mappedData.b2cSellingPrice = Number(updateData.b2c_selling_price);
     if (updateData.b2c_min_quantity)
-      mappedData.b2cMinQuantity = updateData.b2c_min_quantity;
+      mappedData.b2cMinQuantity = Number(updateData.b2c_min_quantity);
     if (updateData.b2c_max_quantity)
-      mappedData.b2cMaxQuantity = updateData.b2c_max_quantity;
+      mappedData.b2cMaxQuantity = Number(updateData.b2c_max_quantity);
     if (updateData.b2b_base_price)
-      mappedData.b2bBasePrice = updateData.b2b_base_price;
+      mappedData.b2bBasePrice = Number(updateData.b2b_base_price);
     if (updateData.b2b_min_order_qty)
-      mappedData.b2bMinOrderQty = updateData.b2b_min_order_qty;
+      mappedData.b2bMinOrderQty = Number(updateData.b2b_min_order_qty);
     if (updateData.b2b_max_order_qty !== undefined)
-      mappedData.b2bMaxOrderQty = updateData.b2b_max_order_qty;
+      mappedData.b2bMaxOrderQty = Number(updateData.b2b_max_order_qty);
     if (updateData.b2b_bulk_tiers)
       mappedData.b2bBulkTiers = updateData.b2b_bulk_tiers;
-    if (updateData.total_stock) mappedData.totalStock = updateData.total_stock;
+    if (updateData.total_stock)
+      mappedData.totalStock = Number(updateData.total_stock);
     if (updateData.b2c_reserved_stock)
-      mappedData.b2cReservedStock = updateData.b2c_reserved_stock;
+      mappedData.b2cReservedStock = Number(updateData.b2c_reserved_stock);
     if (updateData.b2b_reserved_stock)
-      mappedData.b2bReservedStock = updateData.b2b_reserved_stock;
+      mappedData.b2bReservedStock = Number(updateData.b2b_reserved_stock);
     if (updateData.expiry_date) mappedData.expiryDate = updateData.expiry_date;
     if (updateData.is_vegetarian !== undefined)
-      mappedData.isVegetarian = updateData.is_vegetarian;
+      mappedData.isVegetarian =
+        updateData.is_vegetarian === "true" ||
+        updateData.is_vegetarian === true;
     if (updateData.status) mappedData.status = updateData.status;
 
     // Copy other fields directly
+    // Copy other fields directly
     Object.keys(updateData).forEach((key) => {
-      if (!key.includes("_") || key === "is_vegetarian") {
-        if (!mappedData[key]) {
+      // Exclude keys with underscores (handled manually or not needed) and specific fields we processed
+      if (!key.includes("_")) {
+        if (mappedData[key] === undefined) {
+          // Only copy if not already manually mapped (though mappedData uses camelCase mostly)
+          // But updateData is likely snake_case or mixed?
+          // Actually, the keys we care about copying are like 'name', 'brand', 'sku' etc which don't have underscores.
+          // So !key.includes("_") is good.
+          // We must ensure we don't overwrite anything.
           mappedData[key] = updateData[key];
         }
       }
