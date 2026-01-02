@@ -56,6 +56,9 @@ export const productAPI = {
       params: { account_type: accountType },
     }),
   createProduct: (data: FormData) => api.post("/products", data),
+  updateProduct: (productId: string, data: FormData) =>
+    api.put(`/products/${productId}`, data),
+  deleteProduct: (productId: string) => api.delete(`/products/${productId}`),
 };
 
 // Cart APIs
