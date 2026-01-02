@@ -137,7 +137,7 @@ export default function SignupB2BPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Business Name
+                  Business Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="business_name"
@@ -166,7 +166,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  GST Number
+                  GST Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="gst_number"
@@ -179,7 +179,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  PAN Number
+                  PAN Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="pan_number"
@@ -201,7 +201,7 @@ export default function SignupB2BPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Name
+                  Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="contact_person_name"
@@ -213,7 +213,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Email
+                  Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="contact_person_email"
@@ -225,7 +225,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Mobile
+                  Mobile <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="contact_person_mobile"
@@ -246,7 +246,7 @@ export default function SignupB2BPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
-                  Address Line 1
+                  Address Line 1 <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="address_line1"
@@ -258,7 +258,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  City
+                  City <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="city"
@@ -270,7 +270,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  State
+                  State <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="state"
@@ -282,7 +282,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Pincode
+                  Pincode <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="pincode"
@@ -335,7 +335,7 @@ export default function SignupB2BPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Login Email
+                  Login Email <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="email"
@@ -347,7 +347,7 @@ export default function SignupB2BPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="password"

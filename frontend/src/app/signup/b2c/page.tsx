@@ -66,7 +66,7 @@ export default function SignupB2CPage() {
                 htmlFor="full_name"
                 className="block text-sm font-medium text-gray-700"
               >
-                Full Name
+                Full Name <span className="text-red-500">*</span>
               </label>
               <input
                 id="full_name"
@@ -83,7 +83,7 @@ export default function SignupB2CPage() {
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
-                Email Address
+                Email Address <span className="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -100,7 +100,7 @@ export default function SignupB2CPage() {
                 htmlFor="mobile"
                 className="block text-sm font-medium text-gray-700"
               >
-                Mobile Number
+                Mobile Number <span className="text-red-500">*</span>
               </label>
               <input
                 id="mobile"
@@ -117,7 +117,7 @@ export default function SignupB2CPage() {
                 htmlFor="password"
                 className="block text-sm font-medium text-gray-700"
               >
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <input
                 id="password"

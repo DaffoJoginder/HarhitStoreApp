@@ -37,11 +37,7 @@ export const categoryAPI = {
   getCategories: () => api.get("/categories"),
   getSubcategories: (categoryId: string) =>
     api.get(`/categories/${categoryId}/subcategories`),
-  createCategory: (data: {
-    name: string;
-    description?: string;
-    image_url?: string;
-  }) => api.post("/categories", data),
+  createCategory: (data: FormData) => api.post("/categories", data),
   createSubcategory: (
     categoryId: string,
     data: { name: string; description?: string }
@@ -59,7 +55,7 @@ export const productAPI = {
     api.get(`/products/${productId}`, {
       params: { account_type: accountType },
     }),
-  createProduct: (data: any) => api.post("/products", data),
+  createProduct: (data: FormData) => api.post("/products", data),
 };
 
 // Cart APIs

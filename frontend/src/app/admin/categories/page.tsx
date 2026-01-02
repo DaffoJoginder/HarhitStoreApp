@@ -11,6 +11,7 @@ export default function AdminCategoriesPage() {
   // Create Category State
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryDesc, setNewCategoryDesc] = useState("");
+  const [categoryImage, setCategoryImage] = useState<File | null>(null);
 
   // Create Subcategory State
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(
@@ -37,12 +38,17 @@ export default function AdminCategoriesPage() {
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await categoryAPI.createCategory({
-        name: newCategoryName,
-        description: newCategoryDesc,
-      });
+      const formData = new FormData();
+      formData.append("name", newCategoryName);
+      formData.append("description", newCategoryDesc);
+      if (categoryImage) {
+        formData.append("image", categoryImage);
+      }
+
+      await categoryAPI.createCategory(formData);
       setNewCategoryName("");
       setNewCategoryDesc("");
+      setCategoryImage(null);
       fetchCategories();
     } catch (err: any) {
       alert(err.response?.data?.message || "Failed to create category");
@@ -88,7 +94,7 @@ export default function AdminCategoriesPage() {
             <form onSubmit={handleCreateCategory} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Name
+                  Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -108,6 +114,24 @@ export default function AdminCategoriesPage() {
                   onChange={(e) => setNewCategoryDesc(e.target.value)}
                 />
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Category Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setCategoryImage(e.target.files ? e.target.files[0] : null)
+                  }
+                  className="mt-1 block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100"
+                />
+              </div>
               <button
                 type="submit"
                 className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
@@ -123,7 +147,7 @@ export default function AdminCategoriesPage() {
             <form onSubmit={handleCreateSubcategory} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Select Parent Category
+                  Select Parent Category <span className="text-red-500">*</span>
                 </label>
                 <select
                   required
@@ -180,7 +204,9 @@ export default function AdminCategoriesPage() {
 
         {/* Existing Categories List */}
         <div className="mt-12">
-          <h2 className="text-2xl font-semibold mb-6 text-black">Existing Categories</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-black">
+            Existing Categories
+          </h2>
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <ul className="divide-y divide-gray-200">
               {categories.map((category) => (

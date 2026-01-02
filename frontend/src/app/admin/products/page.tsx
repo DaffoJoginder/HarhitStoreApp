@@ -26,19 +26,47 @@ export default function AdminProductsPage() {
     // B2C
     b2c_mrp: "",
     b2c_selling_price: "",
-    b2c_min_quantity: 1,
-    b2c_max_quantity: 10,
+    b2c_min_quantity: "1",
+    b2c_max_quantity: "10",
 
     // B2B
     b2b_base_price: "",
-    b2b_min_order_qty: 1,
-    b2b_max_order_qty: 100,
+    b2b_min_order_qty: "1",
+    b2b_max_order_qty: "100",
 
     // Stock
-    total_stock: 0,
-    b2c_reserved_stock: 0,
-    b2b_reserved_stock: 0,
+    total_stock: "",
+    b2c_reserved_stock: "",
+    b2b_reserved_stock: "",
   });
+
+  const [productImages, setProductImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Cleanup previews on unmount
+    return () => {
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviews]);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      setProductImages((prev) => [...prev, ...newFiles]);
+
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setProductImages((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -69,12 +97,9 @@ export default function AdminProductsPage() {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { name, value, type } = e.target;
-    if (type === "number") {
-      setFormData({ ...formData, [name]: Number(value) });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
+    const { name, value } = e.target;
+    // Keep as string to handle decimals and empty states correctly
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,10 +113,30 @@ export default function AdminProductsPage() {
     setSuccess("");
 
     try {
-      await productAPI.createProduct(formData);
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => {
+        data.append(key, String((formData as any)[key]));
+      });
+
+      productImages.forEach((file) => {
+        data.append("images", file);
+      });
+
+      await productAPI.createProduct(data);
       setSuccess("Product created successfully!");
       // Reset critical fields or form
-      setFormData({ ...formData, sku: "", name: "" });
+      setFormData({
+        ...formData,
+        sku: "",
+        name: "",
+        quantity_per_unit: 1,
+        total_stock: "",
+        b2c_mrp: "",
+        b2c_selling_price: "",
+        b2b_base_price: "",
+      });
+      setProductImages([]);
+      setImagePreviews([]); // Clear previews
       window.scrollTo(0, 0);
     } catch (err: any) {
       setError(err.response?.data?.message || "Failed to create product");
@@ -128,7 +173,7 @@ export default function AdminProductsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  SKU
+                  SKU <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="sku"
@@ -141,7 +186,7 @@ export default function AdminProductsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Product Name
+                  Product Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="name"
@@ -154,7 +199,7 @@ export default function AdminProductsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Brand
+                  Brand <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="brand"
@@ -195,6 +240,62 @@ export default function AdminProductsPage() {
                 onChange={handleChange}
               ></textarea>
             </div>
+
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Product Images
+              </label>
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageChange}
+                className="mt-1 block w-full text-sm text-gray-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-blue-50 file:text-blue-700
+                    hover:file:bg-blue-100"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Select multiple images. They will be appended.
+              </p>
+
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4">
+                  {imagePreviews.map((src, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={src}
+                        alt={`Preview ${index}`}
+                        className="h-24 w-full object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow hover:bg-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </section>
 
           {/* Categorization */}
@@ -205,7 +306,7 @@ export default function AdminProductsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Category
+                  Category <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="category_id"
@@ -224,7 +325,7 @@ export default function AdminProductsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Subcategory
+                  Subcategory <span className="text-red-500">*</span>
                 </label>
                 <select
                   name="subcategory_id"
@@ -275,20 +376,27 @@ export default function AdminProductsPage() {
                 <input
                   name="quantity_per_unit"
                   type="number"
-                  step="0.01"
+                  step={formData.unit === "pc" ? "1" : "0.01"}
+                  min="0"
                   className="mt-1 block w-full rounded border-gray-300 shadow-sm border p-2 text-gray-900"
                   value={formData.quantity_per_unit}
                   onChange={handleChange}
+                  onKeyDown={(e) => {
+                    if (formData.unit === "pc" && e.key === ".") {
+                      e.preventDefault();
+                    }
+                  }}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Total Stock
+                  Total Stock <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="total_stock"
                   type="number"
                   required
+                  min="0"
                   className="mt-1 block w-full rounded border-gray-300 shadow-sm border p-2 text-gray-900"
                   value={formData.total_stock}
                   onChange={handleChange}
@@ -305,7 +413,7 @@ export default function AdminProductsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  MRP
+                  MRP <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="b2c_mrp"
@@ -319,7 +427,7 @@ export default function AdminProductsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Selling Price
+                  Selling Price <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="b2c_selling_price"
@@ -342,7 +450,7 @@ export default function AdminProductsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  B2B Base Price
+                  B2B Base Price <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="b2b_base_price"
@@ -357,7 +465,7 @@ export default function AdminProductsPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Min Order Qty
+                  Min Order Qty <span className="text-red-500">*</span>
                 </label>
                 <input
                   name="b2b_min_order_qty"

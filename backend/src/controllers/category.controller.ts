@@ -1,32 +1,38 @@
-import { Request, Response } from 'express';
-import prisma from '../utils/prisma';
+import { Request, Response } from "express";
+import prisma from "../utils/prisma";
+import { getFileUrl } from "../utils/fileUpload";
 
 export const createCategory = async (req: Request, res: Response) => {
   try {
-    const { name, description, image_url } = req.body;
+    const { name, description } = req.body;
+    let image_url = req.body.image_url;
+
+    if (req.file) {
+      image_url = getFileUrl(req.file.filename);
+    }
 
     const category = await prisma.category.create({
       data: {
         name,
         description,
-        imageUrl: image_url
-      }
+        imageUrl: image_url,
+      },
     });
 
     res.status(201).json({
-      status: 'success',
-      category
+      status: "success",
+      category,
     });
   } catch (error: any) {
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return res.status(400).json({
-        status: 'error',
-        message: 'Category with this name already exists'
+        status: "error",
+        message: "Category with this name already exists",
       });
     }
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to create category'
+      status: "error",
+      message: error.message || "Failed to create category",
     });
   }
 };
@@ -37,20 +43,20 @@ export const getCategories = async (req: Request, res: Response) => {
       where: { isActive: true },
       include: {
         subcategories: {
-          where: { isActive: true }
-        }
+          where: { isActive: true },
+        },
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
     res.json({
-      status: 'success',
-      categories
+      status: "success",
+      categories,
     });
   } catch (error: any) {
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to fetch categories'
+      status: "error",
+      message: error.message || "Failed to fetch categories",
     });
   }
 };
@@ -58,7 +64,12 @@ export const getCategories = async (req: Request, res: Response) => {
 export const updateCategory = async (req: Request, res: Response) => {
   try {
     const { categoryId } = req.params;
-    const { name, description, image_url, is_active } = req.body;
+    const { name, description, is_active } = req.body;
+    let image_url = req.body.image_url;
+
+    if (req.file) {
+      image_url = getFileUrl(req.file.filename);
+    }
 
     const category = await prisma.category.update({
       where: { id: categoryId },
@@ -66,18 +77,18 @@ export const updateCategory = async (req: Request, res: Response) => {
         name,
         description,
         imageUrl: image_url,
-        isActive: is_active !== undefined ? is_active : true
-      }
+        isActive: is_active !== undefined ? is_active : true,
+      },
     });
 
     res.json({
-      status: 'success',
-      category
+      status: "success",
+      category,
     });
   } catch (error: any) {
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to update category'
+      status: "error",
+      message: error.message || "Failed to update category",
     });
   }
 };
@@ -88,17 +99,17 @@ export const deleteCategory = async (req: Request, res: Response) => {
 
     await prisma.category.update({
       where: { id: categoryId },
-      data: { isActive: false }
+      data: { isActive: false },
     });
 
     res.json({
-      status: 'success',
-      message: 'Category deleted successfully'
+      status: "success",
+      message: "Category deleted successfully",
     });
   } catch (error: any) {
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to delete category'
+      status: "error",
+      message: error.message || "Failed to delete category",
     });
   }
 };
@@ -112,24 +123,24 @@ export const createSubcategory = async (req: Request, res: Response) => {
       data: {
         categoryId,
         name,
-        description
-      }
+        description,
+      },
     });
 
     res.status(201).json({
-      status: 'success',
-      subcategory
+      status: "success",
+      subcategory,
     });
   } catch (error: any) {
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return res.status(400).json({
-        status: 'error',
-        message: 'Subcategory with this name already exists in this category'
+        status: "error",
+        message: "Subcategory with this name already exists in this category",
       });
     }
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to create subcategory'
+      status: "error",
+      message: error.message || "Failed to create subcategory",
     });
   }
 };
@@ -141,19 +152,19 @@ export const getSubcategories = async (req: Request, res: Response) => {
     const subcategories = await prisma.subcategory.findMany({
       where: {
         categoryId,
-        isActive: true
+        isActive: true,
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
     res.json({
-      status: 'success',
-      subcategories
+      status: "success",
+      subcategories,
     });
   } catch (error: any) {
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to fetch subcategories'
+      status: "error",
+      message: error.message || "Failed to fetch subcategories",
     });
   }
 };
@@ -168,18 +179,18 @@ export const updateSubcategory = async (req: Request, res: Response) => {
       data: {
         name,
         description,
-        isActive: is_active !== undefined ? is_active : true
-      }
+        isActive: is_active !== undefined ? is_active : true,
+      },
     });
 
     res.json({
-      status: 'success',
-      subcategory
+      status: "success",
+      subcategory,
     });
   } catch (error: any) {
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to update subcategory'
+      status: "error",
+      message: error.message || "Failed to update subcategory",
     });
   }
 };
@@ -190,18 +201,17 @@ export const deleteSubcategory = async (req: Request, res: Response) => {
 
     await prisma.subcategory.update({
       where: { id: subcategoryId },
-      data: { isActive: false }
+      data: { isActive: false },
     });
 
     res.json({
-      status: 'success',
-      message: 'Subcategory deleted successfully'
+      status: "success",
+      message: "Subcategory deleted successfully",
     });
   } catch (error: any) {
     res.status(500).json({
-      status: 'error',
-      message: error.message || 'Failed to delete subcategory'
+      status: "error",
+      message: error.message || "Failed to delete subcategory",
     });
   }
 };
-

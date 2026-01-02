@@ -74,7 +74,7 @@ export default function LoginPage() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="identifier" className="sr-only">
-                Email or Mobile
+                Email or Mobile <span className="text-red-500">*</span>
               </label>
               <input
                 id="identifier"
@@ -91,7 +91,7 @@ export default function LoginPage() {
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <input
                 id="password"
