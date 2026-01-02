@@ -14,7 +14,7 @@ echo ""
 
 # Default values (can be overridden by environment variables)
 DB_USER=${DB_USER:-postgres}
-DB_PASS=${DB_PASS:-postgres}
+DB_PASS=${DB_PASS:-'Dikshita@0410'}
 DB_NAME=${DB_NAME:-instamart_db}
 DB_HOST=${DB_HOST:-localhost}
 DB_PORT=${DB_PORT:-5432}
