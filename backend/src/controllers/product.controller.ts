@@ -352,7 +352,12 @@ export const updateProduct = async (req: Request, res: Response) => {
         select: { images: true },
       });
 
-      const currentImages = (existingProduct?.images as string[]) || [];
+      const currentImages = Array.isArray(existingProduct?.images)
+        ? (existingProduct?.images as any[])
+            .flat()
+            .filter((img) => typeof img === "string" && img.trim() !== "")
+        : [];
+
       mappedData.images = [...currentImages, ...newImages];
     }
 

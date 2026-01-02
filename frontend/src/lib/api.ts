@@ -55,9 +55,14 @@ export const productAPI = {
     api.get(`/products/${productId}`, {
       params: { account_type: accountType },
     }),
-  createProduct: (data: FormData) => api.post("/products", data),
+  createProduct: (data: FormData) =>
+    api.post("/products", data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   updateProduct: (productId: string, data: FormData) =>
-    api.put(`/products/${productId}`, data),
+    api.put(`/products/${productId}`, data, {
+      headers: { "Content-Type": "multipart/form-data" },
+    }),
   deleteProduct: (productId: string) => api.delete(`/products/${productId}`),
 };
 
